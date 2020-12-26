@@ -1,0 +1,46 @@
+# Legoids makefile, donated by George Foot (george.foot@merton.ox.ac.uk)
+#
+# Changes:
+# Added LDFLAGS = -s line to cut down executable size
+
+# Configure Make's internal rules
+
+CC = gcc
+CFLAGS = -O3 -Wall -ffast-math -finline-functions -fomit-frame-pointer\
+	-funroll-loops
+LDFLAGS = -s
+TARGET_ARCH = -m486
+LDLIBS = -lalleg -lppcol
+
+# Tell Make that these aren't really files
+
+.PHONY: all clean cleaner
+
+# Main target in the makefile
+
+all: legoids.exe
+
+# How to make the executable -- Make doesn't know this
+# automatically
+
+legoids.exe: game.o init.o lists.o main.o
+	$(LINK.o) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# We could have just said "gcc -m486 $^ -lalleg -lppcol -o $@"
+
+# Make knows how to make all of these, so we just tell it the
+# dependencies
+
+game.o: game.c globals.h lists.h functs.h
+init.o: init.c globals.h structs.h legdat.h
+lists.o: lists.c structs.h
+main.o: main.c structs.h lists.h functs.h legdat.h
+
+# Cleaning targets
+# Type "make clean" to remove intermediate files
+# Type "make cleaner" to remove the executable too
+
+clean:
+	rm -f game.o init.o lists.o main.o
+cleaner: clean
+	rm -f legoids.exe
